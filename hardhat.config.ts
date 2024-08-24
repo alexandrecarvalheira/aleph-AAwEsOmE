@@ -9,13 +9,15 @@ const config: HardhatUserConfig = {
       url: "https://sepolia.era.zksync.dev",
       ethNetwork: "sepolia",
       zksync: true,
-      verifyURL: "https://explorer.sepolia.era.zksync.dev/contract_verification",
+      verifyURL:
+        "https://explorer.sepolia.era.zksync.dev/contract_verification",
     },
     zkSyncMainnet: {
       url: "https://mainnet.era.zksync.io",
       ethNetwork: "mainnet",
       zksync: true,
-      verifyURL: "https://zksync2-mainnet-explorer.zksync.io/contract_verification",
+      verifyURL:
+        "https://zksync2-mainnet-explorer.zksync.io/contract_verification",
     },
     dockerizedNode: {
       url: "http://localhost:3050",
@@ -34,12 +36,13 @@ const config: HardhatUserConfig = {
   zksolc: {
     version: "latest",
     settings: {
+      isSystem: true,
       // find all available options in the official documentation
       // https://docs.zksync.io/build/tooling/hardhat/hardhat-zksync-solc#configuration
     },
   },
   solidity: {
-    version: "0.8.17",
+    version: "0.8.23",
   },
 };
 

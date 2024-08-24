@@ -49,3 +49,9 @@ Important: ZKsync In-memory Node currently supports only the L2 node. If contrac
 ## License
 
 This project is under the [MIT](./LICENSE) license.
+
+
+## Big changes
+
+there is no UserOp on Zksync, so ValidateUserOp function becomes validateTransaction
+ValidationData should be somehow converted to the magic pattern
