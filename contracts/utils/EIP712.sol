@@ -87,7 +87,7 @@ abstract contract EIP712 {
         internal
         view
         virtual
-        returns (string memory name, string memory version);
+        returns (string memory name, string memory version){}
 
     /// @dev Returns if `_domainNameAndVersion()` may change
     /// after the contract has been deployed (i.e. after the constructor).

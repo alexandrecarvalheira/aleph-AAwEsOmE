@@ -54,7 +54,7 @@ import {
 
 
 
-abstract contract  AAwesomeAccount is IAccount, IERC7579Account, ValidationManager {
+ contract  AAwesomeAccount is IAccount, IERC7579Account, ValidationManager {
     // to get transaction hash
     using TransactionHelper for Transaction;
 
@@ -216,13 +216,13 @@ abstract contract  AAwesomeAccount is IAccount, IERC7579Account, ValidationManag
         // }
     }
 
-    // function executeTransactionFromOutside(
-    //     Transaction calldata _transaction
-    // ) external payable {
-    //     bytes4 magic = _validateTransaction(bytes32(0), _transaction);
-    //     require(magic == ACCOUNT_VALIDATION_SUCCESS_MAGIC, "NOT VALIDATED");
-    //     _executeTransaction(_transaction);
-    // }
+    function executeTransactionFromOutside(
+        Transaction calldata _transaction
+    ) external payable {
+        bytes4 magic = _validateTransaction(bytes32(0), _transaction);
+        require(magic == ACCOUNT_VALIDATION_SUCCESS_MAGIC, "NOT VALIDATED");
+        // _executeTransaction(_txHash,_transaction);
+    }
 function executeFromExecutor(ExecMode execMode, bytes calldata executionCalldata)
         external
         payable
