@@ -13,6 +13,7 @@ import { Deployer } from "@matterlabs/hardhat-zksync-deploy";
 // load env file
 import dotenv from "dotenv";
 import { serializeEip712 } from "zksync-ethers/build/utils";
+import { bigint } from "hardhat/internal/core/params/argumentTypes";
 dotenv.config();
 
 // AA factory address: 0x43E657D98b8Bfd32B01E723D05E55DDB3247A404
@@ -32,7 +33,7 @@ export default async function (hre: HardhatRuntimeEnvironment) {
   );
 
   const account = new Contract(
-    "0xAb36A8Af1D42028258af4DACc10b2f5701A0164F",
+    "0x0Bd203d8Ba716dcf12948e7352C0BEfE75d59668",
     accountArtifact.abi,
     owner
   );
@@ -43,22 +44,23 @@ export default async function (hre: HardhatRuntimeEnvironment) {
 
   //  installModule(uint256 moduleType, address module, bytes calldata initData)
   let installModuleTx = await account.installModule.populateTransaction(
-    1,
+    ethers.parseEther("0"),
     "0xfdF01289dec0293F1e9eb25BBF6a0c72987E1E90",
-    encodedData
+    encodedData,
+    { from: "0x0Bd203d8Ba716dcf12948e7352C0BEfE75d59668", type: 113 }
   );
   installModuleTx = {
     ...installModuleTx,
-    from: "0xAb36A8Af1D42028258af4DACc10b2f5701A0164F",
-    type: 113,
+    // from: "0x0Bd203d8Ba716dcf12948e7352C0BEfE75d59668",
     chainId: (await provider.getNetwork()).chainId,
     nonce: await provider.getTransactionCount(
-      "0xAb36A8Af1D42028258af4DACc10b2f5701A0164F"
+      "0x0Bd203d8Ba716dcf12948e7352C0BEfE75d59668"
     ),
 
     customData: {
-      //   gasPerPubdata: utils.DEFAULT_GAS_PER_PUBDATA_LIMIT,
+      gasPerPubdata: utils.DEFAULT_GAS_PER_PUBDATA_LIMIT,
     },
+    value: ethers.parseEther("0"),
   };
 
   installModuleTx.gasPrice = await provider.getGasPrice();

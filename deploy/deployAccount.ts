@@ -15,7 +15,7 @@ export default async function (hre: HardhatRuntimeEnvironment) {
   const wallet = new Wallet(DEPLOYER_PRIVATE_KEY).connect(provider);
   const deployer = new Deployer(hre, wallet);
   const factoryArtifact = await deployer.loadArtifact("AAwesomeFactory");
-  const aaArtifact = await deployer.loadArtifact("AAwesomeAccount");
+  const aaArtifact = await deployer.loadArtifact("Account");
 
   // Bridge funds if the wallet on ZKsync doesn't have enough funds.
   // const depositAmount = ethers.parseEther('0.1');
@@ -61,7 +61,7 @@ export default async function (hre: HardhatRuntimeEnvironment) {
   await (
     await wallet.sendTransaction({
       to: accountAddress,
-      value: ethers.parseEther("0.002"),
+      value: ethers.parseEther("0.0002"),
     })
   ).wait();
   console.log(`Done!`);

@@ -287,6 +287,7 @@ function executeFromExecutor(ExecMode execMode, bytes calldata executionCalldata
         override
         onlyBootloader()
     {
+        moduleType = MODULE_TYPE_HOOK;
         if (moduleType == MODULE_TYPE_VALIDATOR) {
             ValidationStorage storage vs = _validationStorage();
             ValidationId vId = ValidatorLib.validatorToIdentifier(IValidator(module));
