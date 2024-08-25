@@ -9,6 +9,7 @@ const config: HardhatUserConfig = {
     version: "latest", // Uses latest available in https://github.com/matter-labs/zksolc-bin/
     settings: {
       enableEraVMExtensions: true, // ⚠️ Make sure to include this line
+      isSystem: true,
     },
   },
   defaultNetwork: "zkSyncTestnet",

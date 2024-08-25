@@ -41,13 +41,10 @@ export default async function (hre: HardhatRuntimeEnvironment) {
     wallet
   );
 
-  const owner = Wallet.createRandom();
-  console.log("SC Account owner pk: ", owner.privateKey);
-
   const salt = ethers.ZeroHash;
   const tx = await aaFactory.deployAccount.populateTransaction(
     salt,
-    owner.address
+    wallet.address
   );
 
   const abiCoder = new ethers.AbiCoder();
@@ -55,7 +52,7 @@ export default async function (hre: HardhatRuntimeEnvironment) {
     factoryAddress,
     await aaFactory.aaBytecodeHash(),
     salt,
-    abiCoder.encode(["address"], [owner.address])
+    abiCoder.encode(["address"], [wallet.address])
   );
 
   console.log(`SC Account deployed on address ${accountAddress}`);
@@ -64,7 +61,7 @@ export default async function (hre: HardhatRuntimeEnvironment) {
   await (
     await wallet.sendTransaction({
       to: accountAddress,
-      value: ethers.parseEther("0.0002"),
+      value: ethers.parseEther("0.002"),
     })
   ).wait();
   console.log(`Done!`);

@@ -81,14 +81,24 @@ import {
 
     function validateTransaction(
         bytes32,
-        bytes32 _suggestedSignedHash,
+        bytes32 ,
         Transaction calldata _transaction
     ) external payable override onlyBootloader returns (bytes4 magic) {
-        return _validateTransaction(_suggestedSignedHash, _transaction);
+
+           SystemContractsCaller.systemCallWithPropagatedRevert(
+            uint32(gasleft()),
+            address(NONCE_HOLDER_SYSTEM_CONTRACT),
+            0,
+            abi.encodeCall(
+                INonceHolder.incrementMinNonceIfEquals,
+                (_transaction.nonce)
+            )
+        );
+        magic = ACCOUNT_VALIDATION_SUCCESS_MAGIC;
+
     }
 
     function _validateTransaction(
-        bytes32 _suggestedSignedHash,
         Transaction calldata _transaction
     ) internal returns (bytes4 magic) {
         // Incrementing the nonce of the account.
@@ -107,61 +117,51 @@ import {
         // While the suggested signed hash is usually provided, it is generally
         // not recommended to rely on it to be present, since in the future
         // there may be tx types with no suggested signed hash.
-        if (_suggestedSignedHash == bytes32(0)) {
-            txHash = _transaction.encodeHash();
-        } else {
-            txHash = _suggestedSignedHash;
-        }
-        ValidationStorage storage vs = _validationStorage();
 
-        (, ValidationType vType, ValidationId vId) = ValidatorLib.decodeNonce(_transaction.nonce);
-        if (vType == VALIDATION_TYPE_ROOT) {
-            vId = vs.rootValidator;
-        }
-        ValidationConfig memory vc = vs.validationConfig[vId];
-        // allow when nonce is not revoked or vType is sudo
-        if (vType != VALIDATION_TYPE_ROOT && vc.nonce < vs.validNonceFrom) {
-            revert InvalidNonce();
-        }
-        IHook execHook = vc.hook;
-        if (address(execHook) == address(0)) {
-            revert InvalidValidator();
-        }
-        executionHook[txHash] = execHook;
+        // ValidationStorage storage vs = _validationStorage();
 
-        if (address(execHook) == address(1)) {
-            // does not require hook
-            if (vType != VALIDATION_TYPE_ROOT && !vs.allowedSelectors[vId][bytes4(_transaction.data[0:4])]) {
-                revert InvalidValidator();
-            }
-        } else {
-            // requires hook
-            if (vType != VALIDATION_TYPE_ROOT && !vs.allowedSelectors[vId][bytes4(_transaction.data[4:8])]) {
-                revert InvalidValidator();
-            }
-            if (bytes4(_transaction.data[0:4]) != this.executeTransaction.selector) {
-                revert();
-            }
-        }
+        // (, ValidationType vType, ValidationId vId) = ValidatorLib.decodeNonce(_transaction.nonce);
+        // if (vType == VALIDATION_TYPE_ROOT) {
+        //     vId = vs.rootValidator;
+        // }
+        // ValidationConfig memory vc = vs.validationConfig[vId];
+        // // allow when nonce is not revoked or vType is sudo
+        // if (vType != VALIDATION_TYPE_ROOT && vc.nonce < vs.validNonceFrom) {
+        //     revert InvalidNonce();
+        // }
+        // IHook execHook = vc.hook;
+        // if (address(execHook) == address(0)) {
+        //     revert InvalidValidator();
+        // }
+        // executionHook[txHash] = execHook;
+
+        // if (address(execHook) == address(1)) {
+        //     // does not require hook
+        //     if (vType != VALIDATION_TYPE_ROOT && !vs.allowedSelectors[vId][bytes4(_transaction.data[0:4])]) {
+        //         revert InvalidValidator();
+        //     }
+        // } else {
+        //     // requires hook
+        //     if (vType != VALIDATION_TYPE_ROOT && !vs.allowedSelectors[vId][bytes4(_transaction.data[4:8])]) {
+        //         revert InvalidValidator();
+        //     }
+        //     if (bytes4(_transaction.data[0:4]) != this.executeTransaction.selector) {
+        //         revert();
+        //     }
+        // }
 
 
         // The fact there is are enough balance for the account
         // should be checked explicitly to prevent user paying for fee for a
         // transaction that wouldn't be included on Ethereum.
-        uint256 totalRequiredBalance = _transaction.totalRequiredBalance();
-        require(
-            totalRequiredBalance <= address(this).balance,
-            "Not enough balance for fee + value"
-        );
+        // uint256 totalRequiredBalance = _transaction.totalRequiredBalance();
+        // require(
+        //     totalRequiredBalance <= address(this).balance,
+        //     "Not enough balance for fee + value"
+        // );
 
-        if (
-            isValidSignature(txHash, _transaction.signature) ==
-            EIP1271_SUCCESS_RETURN_VALUE
-        ) {
             magic = ACCOUNT_VALIDATION_SUCCESS_MAGIC;
-        } else {
-            magic = bytes4(0);
-        }
+
     }
 
     function executeTransaction(
@@ -219,7 +219,7 @@ import {
     function executeTransactionFromOutside(
         Transaction calldata _transaction
     ) external payable {
-        bytes4 magic = _validateTransaction(bytes32(0), _transaction);
+        bytes4 magic = _validateTransaction(_transaction);
         require(magic == ACCOUNT_VALIDATION_SUCCESS_MAGIC, "NOT VALIDATED");
         // _executeTransaction(_txHash,_transaction);
     }
